@@ -1,4 +1,4 @@
 import runner, { humanRunner } from './runner'
 
-// runner()
-humanRunner()
+runner()
+// humanRunner()

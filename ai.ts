@@ -14,16 +14,18 @@ interface TrainingItem {
 const trainingSet: TrainingItem[] = []
 
 export const getPosition = (table: number[]): number => {
-  const odds = base.activate(table)
-  // console.log(odds)
-  const best = odds.reduce(
-    (result, probability, position) =>
-      table[position] === 0.5 && probability > result.probability ? { position, probability } : result,
-    { position: 0, probability: 0 }
-  )
+  const odds = base.activate(table).map((x, i) => (table[i] === 0.5 ? x : 0))
+  const sum = odds.slice(0)
+  sum.forEach((x, i) => {
+    sum[i] = i === 0 ? x : sum[i - 1] + x
+  })
+  const point = Math.random() * sum.slice(-1)[0]
+  const best = sum.reduce((result: number | null, x, i): number | null => {
+    return result === null && x > point ? i : result
+  }, null) as number
 
-  trainingSet.push({ input: table.slice(0), output: odds, position: best.position })
-  return best.position
+  trainingSet.push({ input: table.slice(0), output: odds, position: best })
+  return best
 }
 
 export const train = (outcome: number) => {
@@ -31,10 +33,9 @@ export const train = (outcome: number) => {
     ...item,
     output: item.output.map((probability, i) => {
       if (i === item.position)
-        if (outcome === 0.5) return 0.8
+        if (outcome === 0.5) return 0.5
         else if (outcome === item.input[9]) return 1
         else return 0
-      else if (item.input[i] !== 0.5) return 0
       else return probability
     }),
   }))
@@ -43,7 +44,7 @@ export const train = (outcome: number) => {
 
   localSet.forEach(item => {
     base.activate(item.input)
-    base.propagate(0.001, item.output)
+    base.propagate(0.01, item.output)
   })
 
   // process.exit()

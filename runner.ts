@@ -13,7 +13,7 @@ export default function runner() {
   let turnSwitch = Math.round(Math.random())
   let draws = 0
 
-  while (draws < 200000) {
+  while (draws < 1000) {
     table = new Array(10).fill(0.5)
     turnSwitch = (turnSwitch + 1) % 2
 
@@ -29,7 +29,7 @@ export default function runner() {
         if (isWon(table)) {
           // console.log('winner is ' + piece)
           ai.train(piece)
-          if (draws > 10) console.log(draws, 'draws')
+          if (draws > 2) console.log(draws, 'draws')
           draws = 0
           throw new Error('won')
         }
