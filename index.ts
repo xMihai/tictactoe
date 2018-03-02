@@ -1,3 +1,4 @@
-import runner from './runner'
+import runner, { humanRunner } from './runner'
 
-runner()
+// runner()
+humanRunner()

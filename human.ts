@@ -1,6 +1,6 @@
 import * as prompt from 'prompt'
 
-export function getMove(table: number[]): Promise<number> {
+export function getPosition(table: number[]): Promise<number> {
   prompt.start()
   return new Promise((resolve, reject) => {
     prompt.get(

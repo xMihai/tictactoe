@@ -1,7 +1,9 @@
-import { Architect, Layer } from 'synaptic'
+import { Architect, Layer, Network } from 'synaptic'
 import * as fs from 'fs'
+import * as savedNetwork from './network.json'
 
-const base = new Architect.Perceptron(10, 10, 10, 9)
+const base = new Architect.Perceptron(10, 18, 9)
+// const base = Network.fromJSON(savedNetwork)
 
 interface TrainingItem {
   input: number[]
@@ -13,6 +15,7 @@ const trainingSet: TrainingItem[] = []
 
 export const getPosition = (table: number[]): number => {
   const odds = base.activate(table)
+  // console.log(odds)
   const best = odds.reduce(
     (result, probability, position) =>
       table[position] === 0.5 && probability > result.probability ? { position, probability } : result,
@@ -28,7 +31,7 @@ export const train = (outcome: number) => {
     ...item,
     output: item.output.map((probability, i) => {
       if (i === item.position)
-        if (outcome === 0.5) return 0.5
+        if (outcome === 0.5) return 0.8
         else if (outcome === item.input[9]) return 1
         else return 0
       else if (item.input[i] !== 0.5) return 0
@@ -36,11 +39,14 @@ export const train = (outcome: number) => {
     }),
   }))
 
+  // console.log(outcome, localSet)
+
   localSet.forEach(item => {
-    // console.log(item)
     base.activate(item.input)
-    base.propagate(0.01, item.output)
+    base.propagate(0.001, item.output)
   })
+
+  // process.exit()
 
   trainingSet.length = 0
 }
