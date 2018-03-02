@@ -1,5 +1,4 @@
 import * as ai from './ai'
-import * as human from './human'
 
 interface Player {
   getPosition: (table: number[]) => number
@@ -14,7 +13,7 @@ export default async function runner() {
   let turnSwitch = Math.round(Math.random())
   let draws = 0
 
-  for (let n = 0; n <= 500000; n++) {
+  while (draws < 200000) {
     table = new Array(10).fill(0.5)
     turnSwitch = (turnSwitch + 1) % 2
 
