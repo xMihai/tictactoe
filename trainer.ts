@@ -46,6 +46,7 @@ export default function trainer() {
     }
 
     console.log(draws, 'draws')
+    draws = 0
     console.log('ai train')
     ai.train()
     ai.save()

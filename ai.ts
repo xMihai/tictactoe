@@ -20,7 +20,7 @@ interface TrainingItem {
   output: number[]
 }
 
-const trainingSet: TrainingItem[] = []
+const trainingRegister: ObjectMap<ExtendedTrainingItem[]> = {}
 const tempTrainingSet: ExtendedTrainingItem[] = []
 
 export const getPosition = (table: number[]): number => {
@@ -38,9 +38,12 @@ export const getPosition = (table: number[]): number => {
   return best
 }
 
+const getRegisterKey = (item: ExtendedTrainingItem) =>
+  item.input.reduce((result: string, n: number): string => result + n.toString(), '')
+
 export const setTraining = (outcome: Outcome): void => {
-  const localSet: TrainingItem[] = tempTrainingSet.map(item => ({
-    input: item.input,
+  const localSet: ExtendedTrainingItem[] = tempTrainingSet.map(item => ({
+    ...item,
     output: item.output.map((probability, i) => {
       if (i === item.position)
         if (outcome === 0.5) return 0.5
@@ -50,7 +53,11 @@ export const setTraining = (outcome: Outcome): void => {
     }),
   }))
 
-  trainingSet.push(...localSet)
+  localSet.forEach(item => {
+    const key = getRegisterKey(item)
+    trainingRegister[key] = trainingRegister[key] || []
+    trainingRegister[key].push(item)
+  })
 
   // console.log(outcome, localSet)
 
@@ -58,21 +65,35 @@ export const setTraining = (outcome: Outcome): void => {
 }
 
 export const train = () => {
+  const trainingSet: Trainer.TrainingSet = Object.keys(trainingRegister).map(key => {
+    const itemCount = trainingRegister[key].length
+    const output = trainingRegister[key].reduce(
+      (result: number[], item): number[] => item.output.map((x, i) => result[i] + x / itemCount),
+      trainingRegister[key][0].output.map(_ => 0)
+    )
+    // console.log(trainingRegister[key][0].input.length, output.length)
+    return { input: trainingRegister[key][0].input, output }
+  })
+
   trainer.train(trainingSet, {
-    rate: 0.01,
+    rate: 0.05,
     iterations: 5000,
     error: 0.005,
     shuffle: false,
     log: 1000,
-    cost: (targetValues: number[], outputValues: number[]): number => {
-      const newTV: number[] = targetValues.filter(v => [0, 0.5, 1].includes(v))
-      const newOV: number[] = outputValues.filter((_, i) => [0, 0.5, 1].includes(targetValues[i]))
+    cost: Trainer.cost.CROSS_ENTROPY,
+    // cost: (targetValues: number[], outputValues: number[]): number => {
+    //   const newTV: number[] = targetValues.filter(v => [0, 0.5, 1].includes(v))
+    //   const newOV: number[] = outputValues.filter((_, i) => [0, 0.5, 1].includes(targetValues[i]))
 
-      // console.log(newTV, newOV)
+    //   if (newTV.length !== newOV.length) throw new Error('newTV.length !== newOV.length')
 
-      return Trainer.cost.MSE(newTV, newOV)
-    },
+    //   // console.log(newTV, newOV)
+    //   // console.log(Trainer.cost.MSE(newTV, newOV))
+    //   return Trainer.cost.MSE(newTV, newOV)
+    // },
   })
+
   trainingSet.length = 0
 }
 

@@ -8,3 +8,7 @@ declare module '*.json' {
   const a: void
   export default a
 }
+
+interface ObjectMap<T> {
+  [key: string]: T
+}
