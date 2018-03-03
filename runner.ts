@@ -28,14 +28,14 @@ export default function runner() {
 
         if (isWon(table)) {
           // console.log('winner is ' + piece)
-          ai.train(piece)
-          if (draws > 2) console.log(draws, 'draws')
+          ai.setTraining(piece)
+          if (draws > 4) console.log(draws, 'draws')
           draws = 0
           throw new Error('won')
         }
       }
       // console.log('draw')
-      ai.train(0.5)
+      ai.setTraining(0.5)
       draws++
     } catch (e) {
       if (e.message !== 'won') throw e

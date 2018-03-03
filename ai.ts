@@ -1,17 +1,27 @@
-import { Architect, Layer, Network } from 'synaptic'
+import { Architect, Layer, Network, Trainer, Neuron } from 'synaptic'
 import * as fs from 'fs'
 import * as savedNetwork from './network.json'
+import { Outcome } from './trainer'
 
-const base = new Architect.Perceptron(10, 18, 9)
+const base = new Architect.Perceptron(10, 10, 10, 9)
 // const base = Network.fromJSON(savedNetwork)
+// tslint:disable-next-line:align whitespace
+;[base.layers.input, ...base.layers.hidden, base.layers.output].forEach(layer => {
+  layer.set({ squash: Neuron.squash.ReLU })
+})
+const trainer = new Trainer(base)
+
+interface ExtendedTrainingItem extends TrainingItem {
+  position: number
+}
 
 interface TrainingItem {
   input: number[]
   output: number[]
-  position: number
 }
 
 const trainingSet: TrainingItem[] = []
+const tempTrainingSet: ExtendedTrainingItem[] = []
 
 export const getPosition = (table: number[]): number => {
   const odds = base.activate(table).map((x, i) => (table[i] === 0.5 ? x : 0))
@@ -24,13 +34,13 @@ export const getPosition = (table: number[]): number => {
     return result === null && x > point ? i : result
   }, null) as number
 
-  trainingSet.push({ input: table.slice(0), output: odds, position: best })
+  tempTrainingSet.push({ input: table.slice(0), output: odds, position: best })
   return best
 }
 
-export const train = (outcome: number) => {
-  const localSet = trainingSet.map(item => ({
-    ...item,
+export const setTraining = (outcome: Outcome): void => {
+  const localSet: TrainingItem[] = tempTrainingSet.map(item => ({
+    input: item.input,
     output: item.output.map((probability, i) => {
       if (i === item.position)
         if (outcome === 0.5) return 0.5
@@ -40,15 +50,29 @@ export const train = (outcome: number) => {
     }),
   }))
 
+  trainingSet.push(...localSet)
+
   // console.log(outcome, localSet)
 
-  localSet.forEach(item => {
-    base.activate(item.input)
-    base.propagate(0.01, item.output)
+  tempTrainingSet.length = 0
+}
+
+export const train = () => {
+  trainer.train(trainingSet, {
+    rate: 0.01,
+    iterations: 5000,
+    error: 0.005,
+    shuffle: false,
+    log: 1000,
+    cost: (targetValues: number[], outputValues: number[]): number => {
+      const newTV: number[] = targetValues.filter(v => [0, 0.5, 1].includes(v))
+      const newOV: number[] = outputValues.filter((_, i) => [0, 0.5, 1].includes(targetValues[i]))
+
+      // console.log(newTV, newOV)
+
+      return Trainer.cost.MSE(newTV, newOV)
+    },
   })
-
-  // process.exit()
-
   trainingSet.length = 0
 }
 
