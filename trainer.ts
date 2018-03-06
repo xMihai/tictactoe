@@ -17,7 +17,7 @@ export default function trainer() {
   let draws = 0
 
   for (let b = 0; b < 1000; b++) {
-    for (let a = 0; a < 1000; a++) {
+    for (let games = 0; games < 10000; games++) {
       table = new Array(10).fill(0.5)
 
       try {
@@ -49,6 +49,7 @@ export default function trainer() {
     draws = 0
     console.log('ai train')
     ai.train()
+    console.log('ai save')
     ai.save()
   }
 }
