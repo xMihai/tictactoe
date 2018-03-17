@@ -7,7 +7,7 @@ const base = new Architect.Perceptron(10, 9 * 6, 9)
 // const base = Network.fromJSON(savedNetwork)
 const layers = [base.layers.input, ...base.layers.hidden, base.layers.output]
 layers.forEach(layer => {
-  layer.set({ squash: Neuron.squash.ReLU })
+  layer.set({ squash: Neuron.squash.RELU })
 })
 
 const trainer = new Trainer(base)
