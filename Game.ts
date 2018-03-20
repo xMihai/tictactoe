@@ -1,35 +1,56 @@
-import Table, { Piece } from './Table'
-import Player from './Player'
-
-interface HistoryItem {
-  table: number[]
-  position: number
-  turn: number
+export enum Piece {
+  X = 0,
+  Z = 1,
+  NONE = 0.5,
 }
 
 class Game {
-  public readonly table: Table = new Table()
-  private turn: Piece = Math.round(Math.random())
+  private readonly board: number[] = new Array(9).fill(Piece.NONE)
 
-  private history: HistoryItem[] = []
-
-  constructor(private players: Player[]) {}
-
-  public play() {
-    while (!this.table.hasWinner()) {
-      const position: number = this.players[this.turn].getPosition(this)
-
-      if (this.table.isEmpty(position)) {
-        this.history.push({ table: this.table.toArray(), position, turn: this.turn })
-        this.table.fill(position, this.turn)
-      } else throw new Error('invalid move')
-
-      this.advanceTurn()
+  constructor(externalBoard?: number[]) {
+    if (!!externalBoard && this.isValid(externalBoard)) {
+      this.board.length = 0
+      externalBoard.forEach(piece => this.board.push(piece))
     }
   }
 
-  private advanceTurn() {
-    this.turn = (this.turn + 1) % 2
+  /** Is the given board valid? */
+  public isValid(board: number[] = this.board): boolean {
+    return board.length === 9 && board.every(piece => [0, 1, 0.5].includes(piece))
+  }
+
+  /** Get a clone of the board */
+  public getBoard(): number[] {
+    return [...this.board]
+  }
+
+  /** Fill a position with a piece */
+  public fillPosition(position: number, piece: Piece): void {
+    if (this.board[position] === Piece.NONE) this.board[position] = piece
+  }
+
+  /** Get the winner */
+  public getWinner(): Piece {
+    const sets = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+    if (sets.some(set => set.every(p => this.board[p] === Piece.X))) return Piece.X
+    else if (sets.some(set => set.every(p => this.board[p] === Piece.Z))) return Piece.Z
+    else return Piece.NONE
+  }
+
+  /** Does it have a winner yet? */
+  public hasWinner(): boolean {
+    return this.getWinner() !== Piece.NONE
+  }
+
+  /** Is this position empty? */
+  public isPositionEmpty(position: number): boolean {
+    return this.board[position] === Piece.NONE
+  }
+
+  /** Get a list of empty positions */
+  public getEmptyPositions(): number[] {
+    return this.board.map((piece, i) => (piece === Piece.NONE ? i : null)).filter(x => x !== null) as number[]
   }
 }
 
