@@ -30,17 +30,18 @@ class Game {
   }
 
   /** Get the winner */
-  public getWinner(): Piece {
+  public getWinner(): Piece | null {
     const sets = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
     if (sets.some(set => set.every(p => this.board[p] === Piece.X))) return Piece.X
     else if (sets.some(set => set.every(p => this.board[p] === Piece.Z))) return Piece.Z
-    else return Piece.NONE
+    else if (this.board.every(piece => piece !== Piece.NONE)) return Piece.NONE
+    else return null
   }
 
   /** Does it have a winner yet? */
   public hasWinner(): boolean {
-    return this.getWinner() !== Piece.NONE
+    return this.getWinner() !== null
   }
 
   /** Is this position empty? */
@@ -51,6 +52,15 @@ class Game {
   /** Get a list of empty positions */
   public getEmptyPositions(): number[] {
     return this.board.map((piece, i) => (piece === Piece.NONE ? i : null)).filter(x => x !== null) as number[]
+  }
+
+  public log(): void {
+    const getSign = (piece: Piece) => (piece === Piece.NONE ? '-' : Piece[piece])
+
+    console.log(getSign(this.board[0]), getSign(this.board[1]), getSign(this.board[2]))
+    console.log(getSign(this.board[3]), getSign(this.board[4]), getSign(this.board[5]))
+    console.log(getSign(this.board[6]), getSign(this.board[7]), getSign(this.board[8]))
+    console.log(' ')
   }
 }
 

@@ -22,10 +22,16 @@ class Host {
       if (this.game.isPositionEmpty(position)) {
         this.history.push({ table: this.game.getBoard(), position, turn: this.turn })
         this.game.fillPosition(position, this.turn)
-      } else throw new Error('invalid move')
+      } else {
+        this.game.log()
+        throw new Error('Invalid position ' + position)
+      }
 
       this.advanceTurn()
     }
+
+    this.game.log()
+    console.log(Piece[this.game.getWinner()!])
   }
 
   private advanceTurn() {
