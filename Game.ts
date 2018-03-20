@@ -8,7 +8,7 @@ interface HistoryItem {
 }
 
 class Game {
-  private readonly table: Table = new Table()
+  public readonly table: Table = new Table()
   private turn: Piece = Math.round(Math.random())
 
   private history: HistoryItem[] = []
@@ -17,7 +17,7 @@ class Game {
 
   public play() {
     while (!this.table.hasWinner()) {
-      const position: number = this.players[this.turn].getPosition(this.table)
+      const position: number = this.players[this.turn].getPosition(this)
 
       if (this.table.isEmpty(position)) {
         this.history.push({ table: this.table.toArray(), position, turn: this.turn })
@@ -32,3 +32,5 @@ class Game {
     this.turn = (this.turn + 1) % 2
   }
 }
+
+export default Game
