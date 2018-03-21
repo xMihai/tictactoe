@@ -17,12 +17,11 @@ describe('Game', () => {
   })
 
   test('isValid', () => {
-    const isValid = new Game().isValid
-    expect(isValid([0, 1, 0, 1, 0, 1, 0, 1, 0])).toBe(true)
-    expect(isValid([0, 1, 0.5, 0, 1, 0.5, 0, 1, 0.5])).toBe(true)
+    expect(Game.isValid([0, 1, 0, 1, 0, 1, 0, 1, 0])).toBe(true)
+    expect(Game.isValid([0, 1, 0.5, 0, 1, 0.5, 0, 1, 0.5])).toBe(true)
 
-    expect(isValid([0.1, 1, 0.5, 0, 1, 0.5, 0, 1, 0.5])).toBe(false)
-    expect(isValid([0, 1, 0.5, 0, 1, 0.5, 0, 1])).toBe(false)
+    expect(Game.isValid([0.1, 1, 0.5, 0, 1, 0.5, 0, 1, 0.5])).toBe(false)
+    expect(Game.isValid([0, 1, 0.5, 0, 1, 0.5, 0, 1])).toBe(false)
   })
 
   test('getEmptyPositions', () => {

@@ -4,12 +4,12 @@ import Player from './Player'
 interface HistoryItem {
   table: number[]
   position: number
-  turn: number
+  turn: Piece
 }
 
 class Host {
   public readonly game: Game = new Game()
-  private turn: Piece = Math.round(Math.random())
+  private turn: Piece = Piece.X
 
   private history: HistoryItem[] = []
 

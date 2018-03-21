@@ -5,18 +5,39 @@ export enum Piece {
 }
 
 class Game {
+  /** Is the given board valid? */
+  public static isValid(board: number[]): boolean {
+    return board.length === 9 && board.every(piece => [0, 1, 0.5].includes(piece))
+  }
+
+  /** Get the winner */
+  public static getWinner(board: number[]): Piece | null {
+    const sets = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+    if (sets.some(set => set.every(p => board[p] === Piece.X))) return Piece.X
+    else if (sets.some(set => set.every(p => board[p] === Piece.Z))) return Piece.Z
+    else if (board.every(piece => piece !== Piece.NONE)) return Piece.NONE
+    else return null
+  }
+
+  /** Does it have a winner yet? */
+  public static hasWinner(board: number[]): boolean {
+    return Game.getWinner(board) !== null
+  }
+
+  /** Get a list of empty positions */
+  public static getEmptyPositions(board: number[]): number[] {
+    return board.map((piece, i) => (piece === Piece.NONE ? i : null)).filter(x => x !== null) as number[]
+  }
+
+  /** The board */
   private readonly board: number[] = new Array(9).fill(Piece.NONE)
 
   constructor(externalBoard?: number[]) {
-    if (!!externalBoard && this.isValid(externalBoard)) {
+    if (!!externalBoard && Game.isValid(externalBoard)) {
       this.board.length = 0
       externalBoard.forEach(piece => this.board.push(piece))
     }
-  }
-
-  /** Is the given board valid? */
-  public isValid(board: number[] = this.board): boolean {
-    return board.length === 9 && board.every(piece => [0, 1, 0.5].includes(piece))
   }
 
   /** Get a clone of the board */
@@ -31,17 +52,12 @@ class Game {
 
   /** Get the winner */
   public getWinner(): Piece | null {
-    const sets = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
-
-    if (sets.some(set => set.every(p => this.board[p] === Piece.X))) return Piece.X
-    else if (sets.some(set => set.every(p => this.board[p] === Piece.Z))) return Piece.Z
-    else if (this.board.every(piece => piece !== Piece.NONE)) return Piece.NONE
-    else return null
+    return Game.getWinner(this.board)
   }
 
   /** Does it have a winner yet? */
   public hasWinner(): boolean {
-    return this.getWinner() !== null
+    return Game.hasWinner(this.board)
   }
 
   /** Is this position empty? */
@@ -49,9 +65,8 @@ class Game {
     return this.board[position] === Piece.NONE
   }
 
-  /** Get a list of empty positions */
   public getEmptyPositions(): number[] {
-    return this.board.map((piece, i) => (piece === Piece.NONE ? i : null)).filter(x => x !== null) as number[]
+    return Game.getEmptyPositions(this.board)
   }
 
   public log(): void {
