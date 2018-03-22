@@ -1,10 +1,9 @@
-import Game from './Game'
+import Board, { Piece } from './Board'
 import Player from './Player'
-import { Piece } from './Game'
 
 class RandomPlayer extends Player {
-  public getPosition(game: Game): number {
-    const validPositions: number[] = game.getEmptyPositions()
+  public getPosition(board: Board): number {
+    const validPositions: number[] = board.getEmptyPositions()
     return validPositions[Math.floor(Math.random() * validPositions.length)]
   }
 }

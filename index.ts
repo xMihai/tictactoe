@@ -1,8 +1,8 @@
-import Host from './Host'
+import Game from './Game'
 
 import RandomPlayer from './RandomPlayer'
 import MinimaxPlayer from './MinimaxPlayer'
 
-const host = new Host(new MinimaxPlayer(), new MinimaxPlayer())
+const host = new Game(new MinimaxPlayer(), new RandomPlayer())
 
 host.play()

@@ -1,4 +1,4 @@
-import Game, { Piece } from './Game'
+import Board, { Piece } from './Board'
 
 abstract class Player {
   private _piece: Piece = Piece.NONE
@@ -8,7 +8,7 @@ abstract class Player {
   public get piece(): Piece {
     return this._piece
   }
-  public abstract getPosition(game: Game): number
+  public abstract getPosition(board: Board): number
 }
 
 export default Player

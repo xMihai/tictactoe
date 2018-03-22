@@ -1,6 +1,5 @@
-import Game from './Game'
+import Game, { Piece } from './Board'
 import Player from './Player'
-import { Piece } from './Game'
 
 interface Result {
   result: number
@@ -38,8 +37,8 @@ class MinimaxPlayer extends Player {
   }
 
   public getPosition(game: Game): number {
-    if (Game.getEmptyPositions(game.getBoard()).length === 9) return Math.floor(Math.random() * 9)
-    return MinimaxPlayer.getMinimax(game.getBoard(), this.piece).position
+    if (Game.getEmptyPositions(game.toArray()).length === 9) return Math.floor(Math.random() * 9)
+    return MinimaxPlayer.getMinimax(game.toArray(), this.piece).position
   }
 }
 
