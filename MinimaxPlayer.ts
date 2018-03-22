@@ -2,43 +2,44 @@ import Game from './Game'
 import Player from './Player'
 import { Piece } from './Game'
 
-class MinimaxPlayer implements Player {
-  public static getMinimax(board: number[], turn: Piece): { bestResult: number; bestPosition: number } {
+interface Result {
+  result: number
+  position: number
+}
+
+class MinimaxPlayer extends Player {
+  public static getMinimax(board: number[], turn: Piece): Result {
     const positions = Game.getEmptyPositions(board)
 
-    const results = positions.map(position => {
-      const nextBoard = [...board]
-      nextBoard[position] = turn
-      const winner = Game.getWinner(nextBoard)
+    const results: Result[] = positions
+      .map(position => {
+        const nextBoard = [...board]
+        nextBoard[position] = turn
+        const winner = Game.getWinner(nextBoard)
 
-      switch (winner) {
-        case turn:
-          return 1
-        case Piece.NONE:
-          return 0.5
-        case null:
-          return 1 - this.getMinimax(nextBoard, 1 - turn).bestResult
-        default:
-          // the other player
-          return 0
-      }
-    })
+        switch (winner) {
+          case turn:
+            return { result: 1, position }
+          case Piece.NONE:
+            return { result: 0.5, position }
+          case null:
+            return { result: 1 - this.getMinimax(nextBoard, 1 - turn).result, position }
+          default:
+            // the other player
+            return { result: 0, position }
+        }
+      })
+      .sort((a, b) => b.result - a.result)
 
-    let bestResult: number = -1
-    let bestPosition: number = -1
+    const topResults = results.filter(result => result.result === results[0].result)
 
-    positions.forEach((_, i) => {
-      if (results[i] > bestResult) {
-        bestResult = results[i]
-        bestPosition = positions[i]
-      }
-    })
-
-    return { bestResult, bestPosition }
+    if (topResults.length === 1) return topResults[0]
+    else return topResults[Math.floor(Math.random() * topResults.length)]
   }
 
   public getPosition(game: Game): number {
-    return 0
+    if (Game.getEmptyPositions(game.getBoard()).length === 9) return Math.floor(Math.random() * 9)
+    return MinimaxPlayer.getMinimax(game.getBoard(), this.piece).position
   }
 }
 

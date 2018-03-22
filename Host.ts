@@ -10,10 +10,14 @@ interface HistoryItem {
 class Host {
   public readonly game: Game = new Game()
   private turn: Piece = Piece.X
-
+  private players: Player[] = []
   private history: HistoryItem[] = []
 
-  constructor(private players: Player[]) {}
+  constructor(player1: Player, player2: Player) {
+    this.players = [player1, player2]
+    player1.piece = Piece.X
+    player2.piece = Piece.Z
+  }
 
   public play() {
     while (!this.game.hasWinner()) {

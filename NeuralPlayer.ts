@@ -1,10 +1,11 @@
 import Game from './Game'
 import Player from './Player'
 
-class NeuralPlayer implements Player {
+class NeuralPlayer extends Player {
   private readonly network = new Architect.Perceptron(9, 9, 9)
 
   constructor() {
+    super()
     const layers = [this.network.layers.input, ...this.network.layers.hidden, this.network.layers.output]
     layers.forEach(layer => {
       layer.set({ squash: Neuron.squash.RELU })
@@ -12,7 +13,7 @@ class NeuralPlayer implements Player {
   }
 
   public getPosition(game: Game): number {
-    const tableArray = game.table.toArray()
+    const tableArray = game.getBoard()
     const odds = this.network.activate(tableArray).map((x, i) => (tableArray[i] === 0.5 ? x : 0))
 
     const sum = odds.slice(0)
