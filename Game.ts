@@ -2,9 +2,10 @@ import Board, { Piece } from './Board'
 import Player from './Player'
 
 interface HistoryItem {
-  board: number[]
+  input: number[]
   position: number
   turn: Piece
+  output: number
 }
 
 class Game {
@@ -24,7 +25,7 @@ class Game {
       const position: number = this.players[this.turn].getPosition(this.board)
 
       if (this.board.isPositionEmpty(position)) {
-        this.history.push({ board: this.board.toArray(), position, turn: this.turn })
+        this.history.push({ input: this.board.toArray(), position, turn: this.turn, output: 0.5 })
         this.board.fillPosition(position, this.turn)
       } else {
         this.board.log()
@@ -34,9 +35,20 @@ class Game {
       this.advanceTurn()
     }
 
-    this.board.log()
-    console.log(Piece[this.board.getWinner()!])
-    console.log(this.history)
+    const winner = this.board.getWinner()!
+
+    // this.board.log()
+    console.log(Piece[winner])
+
+    if (winner !== Piece.NONE)
+      this.history.forEach(item => {
+        item.output = item.turn === winner ? 1 : 0
+      })
+    // console.log(this.history)
+  }
+
+  public getHistory(): HistoryItem[] {
+    return [...this.history]
   }
 
   private advanceTurn() {
