@@ -1,5 +1,5 @@
 import MinimaxPlayer from './MinimaxPlayer'
-import { Piece } from './Game'
+import { Piece } from './Board'
 
 describe('MinimaxPlayer', () => {
   test('getResults one to go', () => {
